@@ -127,8 +127,8 @@ gulp.task('release', function (callback) {
     'enable-dist-gitignore',
     'do-dist-release',
     'do-dist-release-pt2',
-    'ensure-dev-branch',
-    'remove-local-dist-branch',
+    // 'ensure-dev-branch',
+    // 'remove-local-dist-branch',
     function (error) {
       if (error) {
         console.log(error.message);
