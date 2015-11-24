@@ -105,6 +105,7 @@ gulp.task('release', function (callback) {
     'switch-to-dist-branch',
     'rm-gitignore',
     'enable-dist-gitignore',
+    'do-dist-release',
     'ensure-dev-branch',
     'remove-local-dist-branch',
     function (error) {
