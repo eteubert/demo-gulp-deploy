@@ -55,7 +55,9 @@ gulp.task('add-changes', function() {
 });
 
 gulp.task('commit-changes', function () {
-	return gulp.src('./*').pipe(git.commit('Auto-Commit for deployment v' + getPackageJsonVersion()));
+	return gulp.src('./*')
+		.pipe(excludeGitignore())
+		.pipe(git.commit('Auto-Commit for deployment v' + getPackageJsonVersion()));
 });
 
 gulp.task('create-new-tag', function (cb) {
@@ -101,6 +103,7 @@ gulp.task('do-dist-release', function(cb) {
 
 gulp.task('do-dist-release-pt2', function(cb) {
 	return gulp.src('./*')
+		.pipe(excludeGitignore())
 		.pipe(git.commit('build for release version v' + getPackageJsonVersion()))
 		.pipe(git.push('origin', settings.branch.dist, {args: '--force'}, cb));
 });
