@@ -7,6 +7,7 @@ var fs = require('fs');
 var wp = require('gulp-wp-file-header')('./package.json');
 var rm = require( 'gulp-rm' );
 var rename = require("gulp-rename");
+var excludeGitignore = require('gulp-exclude-gitignore');
 
 var knownOptions = {
   releaseType: 'patch',
@@ -48,7 +49,9 @@ gulp.task('update-wp-style-css', function(cb) {
 });
 
 gulp.task('add-changes', function() {
-	return gulp.src('./*').pipe(git.add());
+	return gulp.src('./*')
+		.pipe(excludeGitignore())
+		.pipe(git.add());
 });
 
 gulp.task('commit-changes', function () {
