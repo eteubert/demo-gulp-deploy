@@ -76,7 +76,7 @@ gulp.task('switch-to-dist-branch', function() {
 });
 
 gulp.task('rm-gitignore', function() {
-	return gulp.src('.gitignore', { read: false }).pipe( rm({ async: false }));
+	return gulp.src('.gitignore').pipe(rm());
 });
 
 gulp.task('enable-dist-gitignore', function() {
