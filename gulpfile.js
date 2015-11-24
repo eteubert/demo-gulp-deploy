@@ -4,7 +4,7 @@ var git = require('gulp-git');
 var minimist = require('minimist');
 var runSequence = require('run-sequence');
 var fs = require('fs');
-var wp = require('gulp-wp-file-header')();
+var wp = require('gulp-wp-file-header')('./package.json');
 var rm = require( 'gulp-rm' );
 
 var knownOptions = {
@@ -45,11 +45,11 @@ gulp.task('update-wp-style-css', function() {
 });
 
 gulp.task('add-changes', function() {
-	gulp.src('.').pipe(git.add());
+	return gulp.src('./*').pipe(git.add());
 });
 
 gulp.task('commit-changes', function () {
-	gulp.src('.').pipe(git.commit('Auto-Commit for deployment v' + getPackageJsonVersion()));
+	return gulp.src('./*').pipe(git.commit('Auto-Commit for deployment v' + getPackageJsonVersion()));
 });
 
 gulp.task('create-new-tag', function (cb) {

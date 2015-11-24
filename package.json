@@ -1,0 +1,15 @@
+{
+  "name": "deploy-demo",
+  "version": "2.0.2",
+  "description": "",
+  "main": "gulpfile.js",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-bump": "^1.0.0",
+    "gulp-git": "^1.6.0",
+    "gulp-rm": "^1.0.0",
+    "gulp-wp-file-header": "^1.0.0",
+    "minimist": "^1.2.0",
+    "run-sequence": "^1.1.5"
+  }
+}
