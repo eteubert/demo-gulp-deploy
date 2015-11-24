@@ -95,8 +95,9 @@ gulp.task('enable-dist-gitignore', function() {
 });
 
 gulp.task('clean-dist-release', function(cb) {
-	return gulp.src('.')
-		.pipe(git.rm({args: '-r --cached'}));
+	git.exec({args: 'rm -r --cached'}, cb);
+	// return gulp.src('.')
+	// 	.pipe(git.rm({args: '-r --cached'}));
 });
 
 gulp.task('do-dist-release', function(cb) {
