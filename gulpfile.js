@@ -62,12 +62,10 @@ gulp.task('create-new-tag', function (cb) {
 		}
 		git.push('origin', settings.branch.dev, {args: '--tags'}, cb);
 	});
-	cb();
 });
 
 gulp.task('push-changes', function (cb) {
 	git.push('origin', settings.branch.dev, cb);
-	cb();
 });
 
 gulp.task('switch-to-dist-branch', function(cb) {
@@ -76,8 +74,8 @@ gulp.task('switch-to-dist-branch', function(cb) {
 			console.log("unable to checkout", settings.branch.dist, "branch");
 			throw err;
 		};
+		cb();
 	});
-	cb();
 });
 
 gulp.task('rm-gitignore', function() {
@@ -88,18 +86,17 @@ gulp.task('enable-dist-gitignore', function() {
 	return gulp.src('.gitignore-dist').pipe(gulp.dest('.gitignore'));
 });
 
-gulp.task('do-dist-release', function() {
+gulp.task('do-dist-release', function(cb) {
 	return gulp.src('./*')
 		.pipe(git.rm({args: '-r --cached'}))
 		.pipe(git.add())
 		.pipe(git.commit('build for release version v' + getPackageJsonVersion()))
-		.pipe(git.push('origin', settings.branch.dist, {args: '--force'}))
+		.pipe(git.push('origin', settings.branch.dist, {args: '--force'}, cb))
 		;
 });
 
 gulp.task('remove-local-dist-branch', function(cb) {
-	git.branch(settings.branch.dist, {args: '-D'});
-	cb();
+	git.branch(settings.branch.dist, {args: '-D'}, cb);
 });
 
 gulp.task('release', function (callback) {
