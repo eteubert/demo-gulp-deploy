@@ -6,6 +6,7 @@ var runSequence = require('run-sequence');
 var fs = require('fs');
 var wp = require('gulp-wp-file-header')('./package.json');
 var rm = require( 'gulp-rm' );
+var rename = require("gulp-rename");
 
 var knownOptions = {
   releaseType: 'patch',
@@ -83,7 +84,9 @@ gulp.task('rm-gitignore', function() {
 });
 
 gulp.task('enable-dist-gitignore', function() {
-	return gulp.src('.gitignore-dist').pipe(gulp.dest('.gitignore'));
+	return gulp.src('.gitignore-dist')
+	.pipe(rename('.gitignore'))
+	.pipe(gulp.dest('.'));
 });
 
 gulp.task('do-dist-release', function(cb) {
