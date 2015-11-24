@@ -89,10 +89,13 @@ gulp.task('enable-dist-gitignore', function() {
 gulp.task('do-dist-release', function(cb) {
 	return gulp.src('./*')
 		.pipe(git.rm({args: '-r --cached'}))
-		.pipe(git.add())
+		.pipe(git.add());
+});
+
+gulp.task('do-dist-release-pt2', function(cb) {
+	return gulp.src('./*')
 		.pipe(git.commit('build for release version v' + getPackageJsonVersion()))
-		.pipe(git.push('origin', settings.branch.dist, {args: '--force'}, cb))
-		;
+		.pipe(git.push('origin', settings.branch.dist, {args: '--force'}, cb));
 });
 
 gulp.task('remove-local-dist-branch', function(cb) {
@@ -112,6 +115,7 @@ gulp.task('release', function (callback) {
     'rm-gitignore',
     'enable-dist-gitignore',
     'do-dist-release',
+    'do-dist-release-pt2',
     'ensure-dev-branch',
     'remove-local-dist-branch',
     function (error) {
