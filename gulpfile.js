@@ -25,23 +25,25 @@ function getPackageJsonVersion () {
 	return JSON.parse(fs.readFileSync('./package.json', 'utf8')).version;
 }
 
-gulp.task('ensure-dev-branch', function() {
+gulp.task('ensure-dev-branch', function(cb) {
 	git.checkout(settings.branch.dev, function (err) {
 		if (err) {
 			console.log("unable to checkout", settings.branch.dev, "branch");
 			throw err;
 		};
 	});
+	cb();
 });
 
 gulp.task('bump-version', function() {
-	gulp.src('./package.json')
+	return gulp.src('./package.json')
 	.pipe(bump({type: options.releaseType}))
 	.pipe(gulp.dest('./'));
 });
 
-gulp.task('update-wp-style-css', function() {
+gulp.task('update-wp-style-css', function(cb) {
 	wp.patch();
+	cb();
 });
 
 gulp.task('add-changes', function() {
@@ -60,10 +62,12 @@ gulp.task('create-new-tag', function (cb) {
 		}
 		git.push('origin', settings.branch.dev, {args: '--tags'}, cb);
 	});
+	cb();
 });
 
 gulp.task('push-changes', function (cb) {
 	git.push('origin', settings.branch.dev, cb);
+	cb();
 });
 
 gulp.task('switch-to-dist-branch', function(cb) {
