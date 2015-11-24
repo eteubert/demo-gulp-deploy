@@ -103,8 +103,8 @@ gulp.task('clean-dist-release', function(cb) {
 gulp.task('do-dist-release', function(cb) {
 	return gulp.src('./*')
 		.pipe(excludeGitignore())
-		.pipe(git.add())
-		.pipe(git.commit('build for release version v' + getPackageJsonVersion()))
+		// .pipe(git.add())
+		.pipe(git.commit('build for release version v' + getPackageJsonVersion(), {args: '-A'}))
 		.pipe(git.push('origin', settings.branch.dist, {args: '--force'}));
 });
 
