@@ -44,10 +44,12 @@ gulp.task('update-wp-style-css', function() {
 	wp.patch();
 });
 
+gulp.task('add-changes', function() {
+	gulp.src('.').pipe(git.add());
+});
+
 gulp.task('commit-changes', function () {
-  return gulp.src('.')
-    .pipe(git.add())
-    .pipe(git.commit('Auto-Commit for deployment v' + getPackageJsonVersion()));
+	gulp.src('.').pipe(git.commit('Auto-Commit for deployment v' + getPackageJsonVersion()));
 });
 
 gulp.task('create-new-tag', function (cb) {
@@ -99,6 +101,7 @@ gulp.task('release', function (callback) {
   	'ensure-dev-branch',
     'bump-version',
     'update-wp-style-css',
+    'add-changes',
     'commit-changes',
     'create-new-tag',
     'push-changes',
