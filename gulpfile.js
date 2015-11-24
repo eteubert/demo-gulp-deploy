@@ -25,7 +25,7 @@ function getPackageJsonVersion () {
 	return JSON.parse(fs.readFileSync('./package.json', 'utf8')).version;
 }
 
-gulp.taks('ensure-dev-branch', function() {
+gulp.task('ensure-dev-branch', function() {
 	git.checkout(settings.branch.dev, function (err) {
 		if (err) {
 			console.log("unable to checkout", settings.branch.dev, "branch");
