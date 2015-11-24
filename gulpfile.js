@@ -102,9 +102,9 @@ gulp.task('clean-dist-release', function(cb) {
 
 gulp.task('do-dist-release', function(cb) {
 	return gulp.src('./*')
-		// .pipe(excludeGitignore())
-		// .pipe(git.add())
-		.pipe(git.commit('build for release version v' + getPackageJsonVersion(), {args: '-a', disableAppendPaths: true}))
+		.pipe(excludeGitignore())
+		.pipe(git.add())
+		.pipe(git.commit('build for release version v' + getPackageJsonVersion(), {disableAppendPaths: true}))
 		.pipe(git.push('origin', settings.branch.dist, {args: '--force'}));
 });
 
