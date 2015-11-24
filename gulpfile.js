@@ -84,7 +84,7 @@ gulp.task('enable-dist-gitignore', function() {
 });
 
 gulp.task('do-dist-release', function() {
-	return gulp.src('.')
+	return gulp.src('./*')
 		.pipe(git.rm({args: '-r --cached'}))
 		.pipe(git.add())
 		.pipe(git.commit('build for release version v' + getPackageJsonVersion()))
