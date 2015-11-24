@@ -66,13 +66,14 @@ gulp.task('push-changes', function (cb) {
 	git.push('origin', settings.branch.dev, cb);
 });
 
-gulp.task('switch-to-dist-branch', function() {
+gulp.task('switch-to-dist-branch', function(cb) {
 	git.checkout(settings.branch.dist, {args: '-B'}, function (err) {
 		if (err) {
 			console.log("unable to checkout", settings.branch.dist, "branch");
 			throw err;
 		};
 	});
+	cb();
 });
 
 gulp.task('rm-gitignore', function() {
@@ -92,8 +93,9 @@ gulp.task('do-dist-release', function() {
 		;
 });
 
-gulp.task('remove-local-dist-branch', function() {
+gulp.task('remove-local-dist-branch', function(cb) {
 	git.branch(settings.branch.dist, {args: '-D'});
+	cb();
 });
 
 gulp.task('release', function (callback) {
