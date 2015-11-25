@@ -55,10 +55,11 @@ gulp.task('update-wp-style-css', function(cb) {
   cb();
 });
 
-gulp.task('bump-version', function() {
-  return gulp.src('./package.json')
+gulp.task('bump-version', function(cb) {
+  gulp.src('./package.json')
   .pipe(bump({type: options.releaseType}))
   .pipe(gulp.dest('./'));
+  cb();
 });
 
 gulp.task('deploy-cmd', shell.task([
