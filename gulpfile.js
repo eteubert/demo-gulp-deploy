@@ -14,7 +14,6 @@ var knownOptions = {
 };
 
 var options = minimist(process.argv.slice(2), knownOptions);
-var version = '';
 
 function getPackageJsonVersion() {
   return JSON.parse(fs.readFileSync('./package.json', 'utf8')).version;
@@ -30,7 +29,6 @@ gulp.task('git-dist-deploy', function(callback) {
      function(res) {
       runSequence(
         'bump-version',
-        'memorize-version',
         'update-wp-style-css',
         'deploy-cmd',
         function (error) {
@@ -44,41 +42,34 @@ gulp.task('git-dist-deploy', function(callback) {
     }));
 });
 
-gulp.task('memorize-version', function(cb) {
-  version = JSON.parse(fs.readFileSync('./package.json', 'utf8')).version;
-  console.log("memorize", version);
-  cb();
-});
-
 gulp.task('update-wp-style-css', function(cb) {
   wp.patch();
   cb();
 });
 
-gulp.task('bump-version', function(cb) {
-  gulp.src('./package.json')
+gulp.task('bump-version', function() {
+  return gulp.src('./package.json')
   .pipe(bump({type: options.releaseType}))
   .pipe(gulp.dest('./'));
-  cb();
 });
 
 gulp.task('deploy-cmd', shell.task([
   'git checkout master',
   'git add --all',
-  'git commit -m "Auto-Commit for deployment "'+ version,
-  'git tag -a '+ version + '-dev -m "Version' + version + '"',
-  'git push origin master ' + version + '-dev',
+  'git commit -m "Auto-Commit for deployment "'+ getPackageJsonVersion(),
+  'git tag -a '+ getPackageJsonVersion() + '-dev -m "Version' + getPackageJsonVersion() + '"',
+  'git push origin master ' + getPackageJsonVersion() + '-dev',
   'git checkout -B dist',
   'rm .gitignore',
   'mv .gitignore-dist .gitignore',
   'git rm -r --cached .',
   'git add --all',
-  'git commit -m "build for release version "' + version,
-  'git tag -a '+ version + '-dist -m "Version' + version + '"',
-  'git push --force origin dist ' + version + '-dist',
+  'git commit -m "build for release version "' + getPackageJsonVersion(),
+  'git tag -a '+ getPackageJsonVersion() + '-dist -m "Version' + getPackageJsonVersion() + '"',
+  'git push --force origin dist ' + getPackageJsonVersion() + '-dist',
   'git checkout master',
   'git branch -D dist',
-  'echo "Deployed Version: "' + version
+  'echo "Deployed Version: "' + getPackageJsonVersion()
 ], {
   ignoreErrors: true
 }));
