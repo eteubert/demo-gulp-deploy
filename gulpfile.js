@@ -19,7 +19,7 @@ function getPackageJsonVersion() {
   return JSON.parse(fs.readFileSync('./package.json', 'utf8')).version;
 }
 
-gulp.task('git-dist-deploy', function() {
+gulp.task('git-dist-deploy', function(callback) {
   gulp.src('/')
     .pipe(prompt.prompt([{
       type: 'confirm',
@@ -39,8 +39,6 @@ gulp.task('git-dist-deploy', function() {
           }
           callback(error);
         });
-      //Patch the style.css to the current version from package.json
-      wp.patch();
     }));
 });
 
