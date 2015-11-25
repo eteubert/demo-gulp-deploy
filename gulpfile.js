@@ -3,6 +3,8 @@ var gulp = require('gulp'),
     shell = require('gulp-shell'),
     prompt = require('gulp-prompt'),
     runSequence = require('run-sequence'),
+    minimist = require('minimist'),
+    fs = require('fs'),
     wp = require('gulp-wp-file-header')()
 ;
 
