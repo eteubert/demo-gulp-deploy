@@ -1,3 +1,24 @@
+/**
+ * Deploy to a branch in the same repository.
+ *
+ * `gulp deploy [--releaseType=major|minor|patch]`
+ *
+ * By default, bumps the version using semantic release, creates 
+ * a distribution from the master branch and deploys to dist branch.
+ *
+ * A `.gitignore-dist` file can be created to define ignored files
+ * for the release.
+ *
+ * The task 'update-wp-style-css' is for WordPress themes only. We need
+ * an adjusted task for WordPress plugins (or remove the task if it's
+ * not a WordPress project).
+ * 
+ * Examples:
+ * 
+ * - `gulp deploy`
+ * - `gulp deploy --releaseType=major`
+ *
+ */
 var gulp = require('gulp'),
     bump = require('gulp-bump');
     shell = require('gulp-shell'),
