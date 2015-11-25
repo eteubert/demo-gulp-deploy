@@ -1,7 +1,7 @@
 /**
  * Deploy to a branch in the same repository.
  *
- * `gulp deploy [--releaseType=major|minor|patch]`
+ * `gulp release [--releaseType=major|minor|patch]`
  *
  * By default, bumps the version using semantic release, creates 
  * a distribution from the master branch and deploys to dist branch.
@@ -15,8 +15,8 @@
  * 
  * Examples:
  * 
- * - `gulp deploy`
- * - `gulp deploy --releaseType=major`
+ * - `gulp release`
+ * - `gulp release --releaseType=major`
  *
  */
 var gulp = require('gulp'),
@@ -48,7 +48,7 @@ function getPackageJsonVersion() {
   return JSON.parse(fs.readFileSync('./package.json', 'utf8')).version;
 }
 
-gulp.task('deploy', function(callback) {
+gulp.task('release', function(callback) {
   gulp.src('/')
     .pipe(prompt.prompt([{
       type: 'confirm',
@@ -59,7 +59,7 @@ gulp.task('deploy', function(callback) {
       runSequence(
         'bump-version',
         'update-wp-style-css', // themes only
-        'deploy-with-git',
+        'deploy',
         function (error) {
           if (error) {
             console.log(error.message);
@@ -82,7 +82,7 @@ gulp.task('bump-version', function() {
   .pipe(gulp.dest('./'));
 });
 
-gulp.task('deploy-with-git', function() {
+gulp.task('deploy', function() {
   return gulp.src('/', {read: false})
     .pipe(shell(
       [
