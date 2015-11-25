@@ -65,25 +65,28 @@ gulp.task('bump-version', function() {
   .pipe(gulp.dest('./'));
 });
 
-gulp.task('deploy-cmd', shell.task([
-  'git checkout master',
-  'git add --all',
-  'git commit -m "Auto-Commit for deployment "'+ getPackageJsonVersion(),
-  'git tag -a '+ getPackageJsonVersion() + '-dev -m "Version' + getPackageJsonVersion() + '"',
-  'git push origin master ' + getPackageJsonVersion() + '-dev',
-  'git checkout -B dist',
-  'rm .gitignore',
-  'mv .gitignore-dist .gitignore',
-  'git rm -r --cached .',
-  'git add --all',
-  'git commit -m "build for release version "' + getPackageJsonVersion(),
-  'git tag -a '+ getPackageJsonVersion() + '-dist -m "Version' + getPackageJsonVersion() + '"',
-  'git push --force origin dist ' + getPackageJsonVersion() + '-dist',
-  'git checkout master',
-  'git branch -D dist',
-  'echo "Deployed Version: "' + getPackageJsonVersion()
-], {
-  ignoreErrors: true
-}));
+gulp.task('deploy-cmd', function() {
+  return gulp.src('/', {read: false})
+    .pipe(shell(
+      [
+        'git checkout master',
+        'git add --all',
+        'git commit -m "Auto-Commit for deployment "'+ getPackageJsonVersion(),
+        'git tag -a '+ getPackageJsonVersion() + '-dev -m "Version' + getPackageJsonVersion() + '"',
+        'git push origin master ' + getPackageJsonVersion() + '-dev',
+        'git checkout -B dist',
+        'rm .gitignore',
+        'mv .gitignore-dist .gitignore',
+        'git rm -r --cached .',
+        'git add --all',
+        'git commit -m "build for release version "' + getPackageJsonVersion(),
+        'git tag -a '+ getPackageJsonVersion() + '-dist -m "Version' + getPackageJsonVersion() + '"',
+        'git push --force origin dist ' + getPackageJsonVersion() + '-dist',
+        'git checkout master',
+        'git branch -D dist',
+        'echo "Deployed Version: "' + getPackageJsonVersion()
+      ]
+    , {ignoreErrors: true}));
+});
 
 gulp.task('default');
