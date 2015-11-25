@@ -1,140 +1,60 @@
-var gulp = require('gulp');
-var bump = require('gulp-bump');
-var git = require('gulp-git');
-var minimist = require('minimist');
-var runSequence = require('run-sequence');
-var fs = require('fs');
-var wp = require('gulp-wp-file-header')('./package.json');
-var rm = require( 'gulp-rm' );
-var rename = require("gulp-rename");
-var excludeGitignore = require('gulp-exclude-gitignore');
+var gulp = require('gulp'),
+    shell = require('gulp-shell'),
+    prompt = require('gulp-prompt'),
+    wp = require('gulp-wp-file-header')(),
+    p = require('./package.json');
 
-var knownOptions = {
-  releaseType: 'patch',
-  alias: { 'r': 'releaseType' }
-};
 
-var options = minimist(process.argv.slice(2), knownOptions);
+gulp.task('git-dist-deploy', function() {
+    gulp.src('/')
+      .pipe(prompt.prompt([{
+        type: 'confirm',
+        name: 'task',
+        message: 'This will deploy to the Dist Branch. It auto commits and pushes to the master. Sure?'
+      },
+      {
+        type: 'confirm',
+        name: 'version',
+        message: 'Have you setup the current release version in package.json?'
+      }],
+       function(res) {
+        if (res.task) {
+            if(res.version == false){
+              console.log("go figure!");
+            }
+            else{
+              //Run the build and deploy task
+              gulp.start('deploy-cmd');
+              //Patch the style.css to the current version from package.json
+              wp.patch();
+            }
 
-var settings = {
-	branch: {
-		dev: "master",
-		dist: "dist"
-	}
-}
 
-function getPackageJsonVersion () {
-	return JSON.parse(fs.readFileSync('./package.json', 'utf8')).version;
-}
+        } else {
+          console.log('Ok. Go do something else first.');
+        }
+      }));
+  });
 
-gulp.task('ensure-dev-branch', function(cb) {
-	git.checkout(settings.branch.dev, function (err) {
-		if (err) {
-			console.log("unable to checkout", settings.branch.dev, "branch");
-			throw err;
-		};
-	});
-	cb();
-});
+  gulp.task('deploy-cmd', shell.task([
+    'git checkout master',
+    'git add --all',
+    'git commit -m "Auto-Commit for deployment "'+ p.version,
+    'git tag -a '+ p.version + '-dev -m "Version' + p.version + '"',
+    'git push origin master ' + p.version + '-dev',
+    'git checkout -B dist',
+    'rm .gitignore',
+    'mv .gitignore-dist .gitignore',
+    'git rm -r --cached .',
+    'git add --all',
+    'git commit -m "build for release version "' + p.version,
+    'git tag -a '+ p.version + '-dist -m "Version' + p.version + '"',
+    'git push --force origin dist ' + p.version + '-dist',
+    'git checkout master',
+    'git branch -D dist',
+    'echo "Deployed Version: "' + p.version
+  ], {
+    ignoreErrors: true
+  }));
 
-gulp.task('bump-version', function() {
-	return gulp.src('./package.json')
-	.pipe(bump({type: options.releaseType}))
-	.pipe(gulp.dest('./'));
-});
-
-gulp.task('update-wp-style-css', function(cb) {
-	wp.patch();
-	cb();
-});
-
-gulp.task('add-changes', function() {
-	return gulp.src('./*')
-		.pipe(excludeGitignore())
-		.pipe(git.add());
-});
-
-gulp.task('commit-changes', function () {
-	return gulp.src('./*')
-		.pipe(excludeGitignore())
-		.pipe(git.commit('Auto-Commit for deployment v' + getPackageJsonVersion()));
-});
-
-gulp.task('create-new-tag', function (cb) {
-	var version = getPackageJsonVersion();
-	git.tag(version, 'Created Tag for version: ' + version, function (error) {
-		if (error) {
-			return cb(error);
-		}
-		git.push('origin', settings.branch.dev, {args: '--tags'}, cb);
-	});
-});
-
-gulp.task('push-changes', function (cb) {
-	git.push('origin', settings.branch.dev, cb);
-});
-
-gulp.task('switch-to-dist-branch', function(cb) {
-	git.checkout(settings.branch.dist, {args: '-B'}, function (err) {
-		if (err) {
-			console.log("unable to checkout", settings.branch.dist, "branch");
-			throw err;
-		};
-		cb();
-	});
-});
-
-gulp.task('rm-gitignore', function() {
-	return gulp.src('.gitignore').pipe(rm());
-});
-
-gulp.task('enable-dist-gitignore', function() {
-	return gulp.src('.gitignore-dist')
-	.pipe(rename('.gitignore'))
-	.pipe(gulp.dest('.'));
-});
-
-gulp.task('clean-dist-release', function(cb) {
-	git.exec({args: 'rm -r --cached .'}, cb);
-	// return gulp.src('.')
-	// 	.pipe(git.rm({args: '-r --cached'}));
-});
-
-gulp.task('do-dist-release', function(cb) {
-	return gulp.src('./*')
-		.pipe(excludeGitignore())
-		.pipe(git.add())
-		.pipe(git.commit('build for release version v' + getPackageJsonVersion(), {disableAppendPaths: true}))
-		.pipe(git.push('origin', settings.branch.dist, {args: '--force'}));
-});
-
-gulp.task('remove-local-dist-branch', function(cb) {
-	git.branch(settings.branch.dist, {args: '-D'}, cb);
-});
-
-gulp.task('release', function (callback) {
-  runSequence(
-  	'ensure-dev-branch',
-    'bump-version',
-    'update-wp-style-css',
-    'add-changes',
-    'commit-changes',
-    'create-new-tag',
-    'push-changes',
-    'switch-to-dist-branch',
-    'rm-gitignore',
-    'enable-dist-gitignore',
-    'clean-dist-release',
-    'do-dist-release',
-    // 'do-dist-release-pt2',
-    'ensure-dev-branch',
-    'remove-local-dist-branch',
-    function (error) {
-      if (error) {
-        console.log(error.message);
-      } else {
-        console.log('RELEASE FINISHED SUCCESSFULLY: ' + getPackageJsonVersion());
-      }
-      callback(error);
-    });
-});
+gulp.task('default');
