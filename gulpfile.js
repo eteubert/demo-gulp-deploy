@@ -20,38 +20,26 @@ function getPackageJsonVersion() {
 }
 
 gulp.task('git-dist-deploy', function(callback) {
-  runSequence(
-  'bump-version',
-  'update-wp-style-css',
-  'deploy-cmd',
-  function (error) {
-    if (error) {
-      console.log(error.message);
-    } else {
-      console.log('RELEASE FINISHED SUCCESSFULLY: ' + getPackageJsonVersion());
-    }
-    callback(error);
-  });
-  // gulp.src('/')
-  //   .pipe(prompt.prompt([{
-  //     type: 'confirm',
-  //     name: 'task',
-  //     message: 'This will deploy to the Dist Branch. It auto commits and pushes to the master. Sure?'
-  //   }],
-  //    function(res) {
-  //     runSequence(
-  //       'bump-version',
-  //       'update-wp-style-css',
-  //       'deploy-cmd',
-  //       function (error) {
-  //         if (error) {
-  //           console.log(error.message);
-  //         } else {
-  //           console.log('RELEASE FINISHED SUCCESSFULLY: ' + getPackageJsonVersion());
-  //         }
-  //         callback(error);
-  //       });
-  //   }));
+  gulp.src('/')
+    .pipe(prompt.prompt([{
+      type: 'confirm',
+      name: 'task',
+      message: 'This will deploy to the Dist Branch. It auto commits and pushes to the master. Sure?'
+    }],
+     function(res) {
+      runSequence(
+        'bump-version',
+        'update-wp-style-css',
+        'deploy-cmd',
+        function (error) {
+          if (error) {
+            console.log(error.message);
+          } else {
+            console.log('RELEASE FINISHED SUCCESSFULLY: ' + getPackageJsonVersion());
+          }
+          callback(error);
+        });
+    }));
 });
 
 gulp.task('update-wp-style-css', function(cb) {
