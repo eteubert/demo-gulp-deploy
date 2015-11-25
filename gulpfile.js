@@ -15,22 +15,30 @@ var knownOptions = {
 
 var options = minimist(process.argv.slice(2), knownOptions);
 
+var settings = {
+  branch: {
+    master: "master",
+    dist: "dist"
+  },
+  remote: 'origin'
+}
+
 function getPackageJsonVersion() {
   return JSON.parse(fs.readFileSync('./package.json', 'utf8')).version;
 }
 
-gulp.task('git-dist-deploy', function(callback) {
+gulp.task('deploy', function(callback) {
   gulp.src('/')
     .pipe(prompt.prompt([{
       type: 'confirm',
       name: 'task',
-      message: 'This will deploy to the Dist Branch. It auto commits and pushes to the master. Sure?'
+      message: 'This will deploy to the ' + settings.branch.dist + ' Branch. It auto commits and pushes to the ' + settings.branch.master + '. Sure?'
     }],
      function(res) {
       runSequence(
         'bump-version',
-        'update-wp-style-css',
-        'deploy-cmd',
+        'update-wp-style-css', // themes only
+        'deploy-with-git',
         function (error) {
           if (error) {
             console.log(error.message);
@@ -53,25 +61,25 @@ gulp.task('bump-version', function() {
   .pipe(gulp.dest('./'));
 });
 
-gulp.task('deploy-cmd', function() {
+gulp.task('deploy-with-git', function() {
   return gulp.src('/', {read: false})
     .pipe(shell(
       [
-        'git checkout master',
+        'git checkout ' + settings.branch.master,
         'git add --all',
         'git commit -m "Auto-Commit for deployment "'+ getPackageJsonVersion(),
         'git tag -a '+ getPackageJsonVersion() + '-dev -m "Version' + getPackageJsonVersion() + '"',
-        'git push origin master ' + getPackageJsonVersion() + '-dev',
-        'git checkout -B dist',
+        'git push ' + settings.remote + ' ' + settings.branch.master + ' ' + getPackageJsonVersion() + '-dev',
+        'git checkout -B ' + settings.branch.dist,
         'rm .gitignore',
         'mv .gitignore-dist .gitignore',
         'git rm -r --cached .',
         'git add --all',
         'git commit -m "build for release version "' + getPackageJsonVersion(),
         'git tag -a '+ getPackageJsonVersion() + '-dist -m "Version' + getPackageJsonVersion() + '"',
-        'git push --force origin dist ' + getPackageJsonVersion() + '-dist',
-        'git checkout master',
-        'git branch -D dist',
+        'git push --force ' + settings.remote + ' ' + settings.branch.dist + ' ' + getPackageJsonVersion() + '-dist',
+        'git checkout ' + settings.branch.master,
+        'git branch -D ' + settings.branch.dist,
         'echo "Deployed Version: "' + getPackageJsonVersion()
       ]
     , {ignoreErrors: true}));
