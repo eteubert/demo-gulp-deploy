@@ -26,7 +26,8 @@ var gulp = require('gulp'),
     runSequence = require('run-sequence'),
     minimist = require('minimist'),
     fs = require('fs'),
-    wp = require('gulp-wp-file-header')()
+    wp = require('gulp-wp-file-header')(),
+    replacestream = require('replacestream')
 ;
 
 var knownOptions = {
@@ -58,7 +59,8 @@ gulp.task('release', function(callback) {
      function(res) {
       runSequence(
         'bump-version',
-        'update-wp-style-css', // themes only
+        'update-wp-style-css', // for WordPress themes
+        // 'update-wp-plugin-file', // for WordPress plugins
         'deploy',
         function (error) {
           if (error) {
@@ -75,6 +77,17 @@ gulp.task('update-wp-style-css', function(cb) {
   wp.patch();
   cb();
 });
+
+gulp.task('update-wp-plugin-file', function(cb) {
+  var plugin = './plugin.php';
+  var read = fs.createReadStream(plugin);
+      write = fs.createWriteStream(plugin, {flags: 'r+'});
+
+  return read
+    .pipe(replacestream(/(Version:)(\s*)(.*)/, '$1$2' + getPackageJsonVersion()))
+    .pipe(write);
+});
+
 
 gulp.task('bump-version', function() {
   return gulp.src('./package.json')
