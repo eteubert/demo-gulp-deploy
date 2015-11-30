@@ -60,7 +60,7 @@ gulp.task('release', function(callback) {
       runSequence(
         'bump-version',
         'update-wp-style-css', // for WordPress themes
-        // 'update-wp-plugin-file', // for WordPress plugins
+        'update-wp-plugin-file', // for WordPress plugins
         'deploy',
         function (error) {
           if (error) {
