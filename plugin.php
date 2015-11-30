@@ -3,7 +3,7 @@
 Plugin Name: My Demo Plugim
 Plugin URI:  http://example.com
 Description: This describes my plugin in a short sentence
-Version:     2.2.0
+Version:     2.3.1
 License:     MIT
 */
 
