@@ -45,6 +45,10 @@ var settings = {
   remote: 'origin'
 }
 
+var wordpress = {
+  plugin: './plugin.php'
+};
+
 function getPackageJsonVersion() {
   return JSON.parse(fs.readFileSync('./package.json', 'utf8')).version;
 }
@@ -79,9 +83,8 @@ gulp.task('update-wp-style-css', function(cb) {
 });
 
 gulp.task('update-wp-plugin-file', function(cb) {
-  var plugin = './plugin.php';
-  var read = fs.createReadStream(plugin);
-      write = fs.createWriteStream(plugin, {flags: 'r+'});
+  var read = fs.createReadStream(wordpress.plugin);
+      write = fs.createWriteStream(wordpress.plugin, {flags: 'r+'});
 
   return read
     .pipe(replacestream(/(Version:)(\s*)(.*)/, '$1$2' + getPackageJsonVersion()))
